@@ -1,8 +1,10 @@
+ifndef PYTHON
 PYTHON=python
+endif
 
 PROJECT=pynodestatviz
 
-VERSION=0.2.1
+VERSION=0.2.2
 
 .PHONY:	rpm spec
 
@@ -54,7 +56,7 @@ stdeb.cfg: stdeb.cfg.in
 rpm:	setup.py 
 	$(PYTHON) setup.py bdist_rpm  \
    --vendor "Adjacent Link LLC"  \
-   --requires "tkinter python-pmw python-lxml"
+   --requires "tkinter,python-pmw,python-lxml"
 
 deb:	setup.py stdeb.cfg
 	$(PYTHON) setup.py --command-packages=stdeb.command bdist_deb

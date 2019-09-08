@@ -31,12 +31,20 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 
+from __future__ import absolute_import, division, print_function
 from lxml import etree
-from Tkinter import *
+
+try:
+    import Tkinter as tkinter
+    from Tkinter import *
+except:
+    import tkinter
+    from tkinter import *
+
 from textwrap import dedent
 from pkg_resources import resource_filename
-from nodedisplaycanvas import  NodeDisplayCanvas
-from nodepropertyframe import NodePropertyFrame
+from .nodedisplaycanvas import  NodeDisplayCanvas
+from .nodepropertyframe import NodePropertyFrame
 from . import RenderException
 import os
 
@@ -167,7 +175,7 @@ class NodeStatViz(Frame):
                 message = ""
                 for entry in  locationSchema.error_log:
                     message += "%d: %s\n" % (entry.line,entry.message)
-                print >> sys.stderr, message
+                print(message, file=sys.stderr)
 
             for node in locationRoot.xpath('/nodestatviz-locations/nodes/node'):
                 self._locations[node.get('name')]=(float(node.get('x')),
@@ -188,13 +196,13 @@ class NodeStatViz(Frame):
 
         f = open(self._locationsFile, 'w')
         
-        print >> f, etree.tostring(root,pretty_print=True)
+        print(etree.tostring(root,pretty_print=True).decode('utf-8'), file=f)
 
         f.close()
 
 
     def update(self,xml):
-        os.write(self._pipeWrite,"%05d%s" % (len(xml),xml))
+        os.write(self._pipeWrite,b"%05d%s" % (len(xml),xml))
 
     def _render(self,file,mask):
         length = os.read(file,5)
@@ -209,7 +217,7 @@ class NodeStatViz(Frame):
             message = ""
             for entry in self._schema.error_log:
                 message += "%d: %s\n" % (entry.line,entry.message)
-                print >> sys.stderr,"\nInvalid update:\n",message.rstrip()
+                print("\nInvalid update:\n",message.rstrip(), file=sys.stderr)
                 return
 
         result_tree = self._transform(root)
@@ -218,7 +226,7 @@ class NodeStatViz(Frame):
             message = ""
             for entry in self._transform.error_log:
                 message += "%s\n" %(entry.message)
-            print >> sys.stderr, "\nInvalid update:\n",message.rstrip()
+            print("\nInvalid update:\n",message.rstrip(), file=sys.stderr)
             return
 
         root = result_tree.getroot()

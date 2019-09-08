@@ -32,14 +32,18 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 
+from __future__ import absolute_import, division, print_function
 from optparse import OptionParser
 from pynodestatviz import NodeStatViz,RenderException
 import sys
-import SocketServer
+try:
+    import SocketServer as socketserver
+except:
+    import socketserver
 import threading
 import os
 
-class XMLStatusHandler(SocketServer.BaseRequestHandler):
+class XMLStatusHandler(socketserver.BaseRequestHandler):
     def handle(self):
         self._messageInProgress  = False
         self._lengthInProgress   = False
@@ -125,11 +129,11 @@ class XMLStatusHandler(SocketServer.BaseRequestHandler):
 
             data = self.request.recv(5)
 
-class XMLStatusServer(SocketServer.TCPServer):
+class XMLStatusServer(socketserver.TCPServer):
     allow_reuse_address = True
 
     def __init__(self, server_address, RequestHandlerClass,renderEngine):
-        SocketServer.TCPServer.__init__(self,server_address,RequestHandlerClass)
+        socketserver.TCPServer.__init__(self,server_address,RequestHandlerClass)
         self.renderEngine = renderEngine
 
 usage = "%prog [OPTION]... "
@@ -148,7 +152,7 @@ optionParser.add_option("",
 (options, args) = optionParser.parse_args()
 
 if len(args) != 0 :
-    print >> sys.stderr, "invalid number of arguments"
+    print("invalid number of arguments", file=sys.stderr)
     exit(1)
 
 

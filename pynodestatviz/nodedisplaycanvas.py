@@ -30,7 +30,12 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 
-from Tkinter import *
+from __future__ import absolute_import, division, print_function
+try:
+    from Tkinter import *
+except:
+    from tkinter import *
+
 import Pmw
    
 class NodeDisplayCanvas(Pmw.ScrolledCanvas):
