@@ -1,0 +1,155 @@
+Summary: Simple Node Link and Statistic Visualization Tool
+Name:  pynodestatviz
+Version: @VERSION@
+Release: 1%{?dist}
+License: BSD
+Group: Development/Libraries
+URL: https://github.com/adjacentlink/pynodestatviz
+Source0: %{name}-%{version}.tar.gz
+BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
+Vendor: Adjacent Link LLC
+BuildArch: noarch
+
+%define with_old_depends 0
+%define with_pathfix 1
+
+# RHEL/CentOS
+%if 0%{?el7}
+%define with_python2 1
+%define with_old_depends 1
+%define with_pathfix 0
+%endif
+
+%if 0%{?el8}
+%define with_python3 1
+%endif
+
+# Fedora (non-EOL)
+%if 0%{?fedora}
+%if %{fedora} < 31
+%define with_python3 1
+%define with_python2 1
+%else
+%define with_python3 1
+%endif
+%endif
+
+%if 0%{?with_python2}
+%if %{with_old_depends}
+%define use_python2_sitelib %{python_sitelib}
+%else
+%define use_python2_sitelib %{python2_sitelib}
+%endif
+%endif
+
+%global _description \
+Simple Node Link and Statistic Visualization Tool
+
+%description %{_description}
+
+%if 0%{?with_python2}
+%package -n python2-%{name}
+Summary: %{summary}
+%{?python_provide:%python_provide python2-%{name}}
+%if %{with_old_depends}
+BuildRequires: python-devel
+Requires: tkinter
+Requires: python-pmw
+Requires: python-lxml
+%define use_python2_sitelib %{python_sitelib}
+%else
+BuildRequires: python2-devel
+Requires: python2-tkinter
+Requires: python2-pmw
+Requires: python2-lxml
+%define use_python2_sitelib %{python2_sitelib}
+%endif
+%description -n python2-%{name} %{_description}
+%endif
+
+%if 0%{?with_python3}
+%package -n python3-%{name}
+Summary: %{summary}
+%{?python_provide:%python_provide python3-%{name}}
+BuildRequires: python3-devel
+Requires: python3-tkinter
+Requires: python3-pmw
+Requires: python3-lxml
+%description -n python3-%{name} %{_description}
+%endif
+
+%prep
+%setup -q
+
+%build
+%configure
+
+%install
+%if 0%{?with_python3}
+make  DESTDIR=${RPM_BUILD_ROOT} PYTHON=%{__python3} install
+
+mv %{buildroot}/%{_bindir}/pynodestatviz %{buildroot}/%{_bindir}/pynodestatviz-%{python3_version}
+ln -s pynodestatviz-%{python3_version} %{buildroot}%{_bindir}/pynodestatviz-3
+%if 0%{?with_python2} == 0
+ln -s pynodestatviz-3 %{buildroot}%{_bindir}/pynodestatviz
+%endif
+pathfix.py -pni "%{__python3} %{py3_shbang_opts}" %{buildroot}%{_bindir}/*-%{python3_version}
+%endif
+
+%if 0%{?with_python2}
+make  DESTDIR=${RPM_BUILD_ROOT} PYTHON=%{__python2} install
+
+mv %{buildroot}/%{_bindir}/pynodestatviz %{buildroot}/%{_bindir}/pynodestatviz-%{python2_version}
+ln -s pynodestatviz-%{python2_version} %{buildroot}%{_bindir}/pynodestatviz-2
+ln -s pynodestatviz-2 %{buildroot}%{_bindir}/pynodestatviz
+%if %{with_pathfix}
+pathfix.py -pni "%{__python2} %{py2_shbang_opts}" %{buildroot}%{_bindir}/*-%{python2_version}
+%endif
+%endif
+
+find ${RPM_BUILD_ROOT} -name '*.a' -exec rm '{}'  \;
+find ${RPM_BUILD_ROOT} -name '*.la' -exec rm '{}' \;
+mkdir -p ${RPM_BUILD_ROOT}%{_pkgdocdir}
+install -t ${RPM_BUILD_ROOT}%{_pkgdocdir} AUTHORS %{!?_licensedir:COPYING} ChangeLog NEWS README 
+%if 0%{?_licensedir:1}
+mkdir -p ${RPM_BUILD_ROOT}%{_licensedir}/%{name}
+install -t ${RPM_BUILD_ROOT}%{_licensedir}/%{name} COPYING
+%endif
+
+%clean
+rm -rf $RPM_BUILD_ROOT
+
+%post
+
+%postun
+
+%if 0%{?with_python2}
+%files -n python2-%{name}
+%defattr(-,root,root,-)
+%{_bindir}/pynodestatviz
+%{_bindir}/pynodestatviz-2
+%{_bindir}/pynodestatviz-%{python2_version}
+%{use_python2_sitelib}/*
+%doc %{_pkgdocdir}
+%if 0%{?_licensedir:1}
+%dir %{_licensedir}/%{name}
+%license %{_licensedir}/%{name}/COPYING
+%endif
+%endif
+
+%if 0%{?with_python3}
+%files -n python3-%{name}
+%defattr(-,root,root,-)
+%{_bindir}/pynodestatviz-3
+%{_bindir}/pynodestatviz-%{python3_version}
+%if 0%{?with_python2} == 0
+%{_bindir}/pynodestatviz
+%endif
+%{python3_sitelib}/*
+%doc %{_pkgdocdir}
+%if 0%{?_licensedir:1}
+%dir %{_licensedir}/%{name}
+%license %{_licensedir}/%{name}/COPYING
+%endif
+%endif
+

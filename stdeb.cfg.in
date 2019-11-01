@@ -1,4 +1,0 @@
-[DEFAULT]
-Depends: python-tk, python-pmw, python-lxml 
-Suite: @DEBIAN_VERSION@
-Package: pynodestatviz
