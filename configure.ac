@@ -69,7 +69,7 @@
  See toplevel COPYING for more information.
 ])
 
-AC_INIT([pynodestatviz],0.2.3,[labs at adjacentlink dot com])
+AC_INIT([pynodestatviz],0.2.4,[labs at adjacentlink dot com])
 
 AC_CONFIG_SRCDIR([pynodestatviz])
 
