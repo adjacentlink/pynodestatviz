@@ -6,13 +6,6 @@ Build-Depends: debhelper (>= 8.0.0), dh-python
 Standards-Version: 3.9.3
 Homepage: https://github.com/adjacentlink/pynodestatviz
 
-Package: python-pynodestatviz
-Section: python
-Architecture: all
-Replaces: pynodestatviz
-Depends: ${python:Depends}, ${misc:Depends}
-Description: Simple Node Link and Statistic Visualization Tool
-
 Package: python3-pynodestatviz
 Section: python
 Architecture: all
